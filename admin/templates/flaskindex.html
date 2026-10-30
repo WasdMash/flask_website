@@ -1,0 +1,123 @@
+{%extends "base.html"%}
+{%block title%} Posts page{%endblock%}
+{%block style%}
+	<style>
+	</style>
+{%endblock%}
+{% block header %}
+	<span class="avatar">
+		<img src="{{ user.avatar(128) }}"> 
+	</span>
+	<h1> 
+		 Hey {{ user.name }}, what do you want to learn today?
+	</h1>
+	<span class="fc-black-400">Hey, here's all you need to know about me: {{ user.about_me }}.</span>
+{% endblock %}
+{%block content%}
+	{% with messages  = get_flashed_messages()%}
+		{% if messages%}
+			{% for msg in messages%}
+				<p>{{msg}}</p>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+	<br><br><br><br>
+	
+	{%if request.path == "/education/home"%}
+		<h2> Would you like to ask a question?</h2>
+		<h4>Make sure to look at a couple of previous questions to make sure that your question hasn't already been answered</h4>
+		<form action="/education/contribute" method="POST">
+			<textarea rows="2" name="title" placeholder="What exactly is your question?"></textarea>/>
+			<br><br>
+			<textarea rows="3" name="body" placeholder="Be as descriptive about your question as possible. What exactly is not making sense to you? Use as many keywords as necessary to get what you want to know across."></textarea>
+			<br><br>
+			<textarea rows="3" name="tags" placeholder="Enter tags (separated by commas) which can help others in your situation find the question. Use examples such as subject, sub-topic, year and other keywords etc."></textarea>
+			<br><br>
+			<input class="btn btn-warning"type="submit" name="Submit" value="Ask a question" />
+		</form>
+		<br><br>
+	{%endif%}
+
+	<h2> What everyone else is asking today?</h2>
+	{% for item in posts %}
+		<!-- Ideally, might want to make a section here with the post details on the left and replies on the right-->
+		<div class="row">
+			<div class="sm:col-6 mb-3 sm:mb-0">
+				<!--This left column will represent the actual post itself-->
+				<div class="card">
+					<div class="card-header"> <h3>Question</h3></div>
+					<div class="card-body">
+						<span class="avatar" style="margin-left:5%"><img src="{{ item.question_author.avatar(256) }}"> </span>
+						<h4 class="card-title">{{ item.title }}</h4>
+						<p class="card-text"><b>Details:</b> {{item.body}}</p>
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item"> <b>Asked by:</b> {{item.question_author.name }} on {{item.timestamp.strftime("%d/%m/%Y at %H:%M")}}</li>
+							<!-- Cheating using &nbsp; to spread out upvotes and downvotes instead of lexing - genuinely can't be bothered to do all that-->
+							<li class="list-group-item"> <b>Upvotes:</b> {{item.upvotes}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Downvotes:</b> {{item.downvotes}}</li>
+							<li class="list-group-item"> <p>Tags: {%for tag in item.tags%} {%print(tag.name)%} {%endfor%}</p></li>
+						</ul>
+					</div>
+					
+					{%if item.question_author == user%}
+						<div class="card-body flex-row gap-4">
+							<ul class="list-group list-group-flush">
+								<li class="list-group-item">
+									<h3 class="card-title">If you ever wish to edit your post:</h3>
+								</li>
+								<li class="list-group-item">
+									<!-- Lowkey, the form in here looks kinda cramped - perhaps let's make it another row-->
+									<form method="POST" action="/education/edit_post/{{item.id}}">
+										<textarea rows="2" cols="50" type="text" name="title" placeholder="What exactly is your question now?"></textarea>
+										<br><br><br>
+										<textarea rows="3" cols="50" name="body" placeholder="Be as descriptive about your question as possible. What exactly is not making sense to you? Use as many keywords as necessary to get what you want to know across."></textarea>
+										<br><br><br>
+										<textarea rows="3" cols="50" name="tags" placeholder="Enter tags (separated by commas) which can help others in your situation find the question. Use examples such as subject, sub-topic, year and other keywords etc."></textarea>
+										<br><br><br>
+										<input class="btn btn-warning"type="submit" name="Submit" value="Ask a question" />
+									</form>
+								</li>
+							</ul>
+						</div>
+						{%else%}
+						<!-- Can't be having users manipulate the votes by voting for themselves, can we?-->
+						<div class="card-body flex-row gap-4">
+							<a style= "margin-right:5%;" href="{{url_for('blueprint.upvote', id=item.id)}}" class="btn-outline theme-success">Upvote</a>
+							<a style="margin-right:1%;" href="{{url_for('blueprint.downvote', id=item.id)}}" class="btn-subtle theme-danger">Downvote</a>
+						</div>
+					{%endif%}
+				</div>
+			</div>
+			<!--This right column will represent the replies to this post-->
+			<div class="sm:col-6">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title">Answers</h4>
+						<form method="POST" action="/education/answer/{{item.id}}">
+							<textarea rows="3" cols="50 "placeholder="Wish to answer this question? Feel free to answer."></textarea>
+							<br> <input type="submit" name="Submit" value="Answer">
+						</form>
+						{%for reply in item.replies%}
+							<!-- Make a similar upvote and downvote system using the Replies database-->
+							<div class="card">
+								<span class="card-img-top">
+									<img style="float:left; height: 5%; width: 5%;" src="{{ reply.comment_author.avatar(256) }}">
+								</span>
+								<div class="card-body">
+									<h3 class="card-title"><b>Answered by:</b> {{reply.comment_author.name }} on {{reply.timestamp.strftime("%c")}}</h3>
+									<div class="card-text">
+										<p class="card-text"><b>Detailed answer:</b> {{reply.reply}}</p>
+									</div>
+								</div>
+								<div class="card-body flex-row gap-4">
+									<a style="float:right; margin-right:5%;" href="{{url_for('blueprint.post_upvote', id=reply.id)}}" class="btn-outline theme-success">Upvotes: {{reply.upvotes}}</a>
+									<a style="float:right; margin-right:1%;" href="{{url_for('blueprint.post_downvote', id=reply.id)}}" class="btn-subtle theme-danger">Downvotes: {{reply.downvotes}}</a>
+								</div>
+							</div>	
+						{%endfor%}
+					</div>
+				</div>
+			</div>
+		</div>
+		<br><br>
+	{%endfor%}
+{%endblock%}

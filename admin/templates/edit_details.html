@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title%}Login Page{% endblock %}
+{%block style%}
+	<style>
+		/* Uhh, to be determined later, once I fix my UI design first*/
+	</style>
+{%endblock%}
+{% block content%}
+	{% with messages  = get_flashed_messages()%}
+		{% if messages%}
+			{% for msg in messages%}
+				<p>{{msg}}</p>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+
+	<h2>Here, you can edit the details of your profile</h2>
+	<p>You do not have to enter new details for all of the sections, just the ones which you wish to edit</p>
+
+	<form action="/user/{{detail}}/edit_profile" method="POST">
+		<input style="width: 30%;" type="text" name="nm" placeholder="Enter your username" value="{{name if name}}"/> <br>
+		<input style="width: 30%; height: auto;" type="text" name="about_me" placeholder="Describe your account. What do you study/teach? Any topics you can help others out on and topics you need help on?" value="{{name if name}}"/> <br>
+		<input style="width: 30%;" type="email" name="email" placeholder="Enter email" value="{{email if email}}"/> <br>
+		<input style="width: 30%;" type="text" name="password1" placeholder="Enter password" value="{{email if email}}"/> <br>
+		<input style="width: 30%;" type="text" name="password2" placeholder="Confirm password" value="{{email if email}}"/> <br>
+		<input type="submit" name="Submit" value="Submit" />
+	</form>
+
+	<button type="button" class="btn-solid theme-danger" data-bs-toggle="dialog" data-bs-target="#exampleDialog">
+		Delete your account
+	</button>
+
+	<dialog class="dialog" id="exampleDialog">
+		<div class="dialog-header">
+			<h1 class="dialog-title">Delete Account!</h1>
+			<button type="button" class="btn-close" data-bs-dismiss="dialog" aria-label="Close"></button>
+		</div>
+		<div class="dialog-body">
+			<form action="/delete/{{detail}}">
+				<div class="card card-body">
+					<h1 class="card-title">Delete Account</h1>
+					<p class="card-text">Are you sure you want to delete your account?</p>
+
+					<!-- This button doesn't actually do anything yet-->
+					<div class="clearfix">
+						<button type="button" class="cancelbtn">Cancel</button>
+						<button type="button" class="btn-solid theme-danger deletebtn">Delete</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="dialog-footer">
+			<button type="button" class="btn-solid theme-secondary" data-bs-dismiss="dialog">Close</button>
+		</div>
+	</dialog>
+{% endblock %}

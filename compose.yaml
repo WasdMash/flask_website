@@ -1,0 +1,12 @@
+services:
+  #This is one of the services/tasks that my Docker will run simultaneously with others
+  web:
+    build: . #I want to build everything in this directory - this whole thing is my project
+    ports:
+      - "8000:8000" #Rn, this bad boy runs locally, so I can access this site locally by using this localhost:8000 port
+    environment:
+      DATABASE_URL: sqlite:////data/users.sqlite3 #Tells my local Python code to look in data for my users.sqlite3 database
+      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
+    volumes:
+      - ./users.sqlite3:/data/users.sqlite3:Z #This tells my Docker container to look inside . and /data for my users.sqlite3
+

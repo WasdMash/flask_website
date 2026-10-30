@@ -1,0 +1,169 @@
+{%extends "base.html"%}
+{%block title%} Task management {%endblock%}
+{%block style%}
+	<style>
+		#base-timer-path-remaining {
+			fill: none;
+			stroke: #41b883;
+			stroke-width: 7;
+			stroke-linecap: round;
+			stroke-dasharray: 283;
+			stroke-dashoffset: 0;
+			transition: stroke-dashoffset 1s linear, stroke 0.3s;
+		}
+
+		/*Code to get the pomodoro timer working again*/
+		.base-timer, #centre { 
+			display: block ;
+			margin-left: auto;
+			margin-right: auto;
+			position: relative;
+			width: 40%;
+			height: 40%; 
+		}
+
+		.base-timer__svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+		.base-timer__path-elapsed { fill: none; stroke: #ccc; stroke-width: 7; }
+		.base-timer__label {
+			background: none;
+			position: absolute;
+			inset: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 2rem;
+		}
+
+		#pomodoro{ width: 40%; }
+
+		/* I need to learn how to make a website not ugly*/
+	</style>
+{%endblock%}
+{% block header %}
+<h1> Why, hello there, {{user.name}}. Ready to get some work done today?</h1>	
+{% endblock %}
+{%block content%}
+	{% with messages  = get_flashed_messages()%}
+		{% if messages%}
+			{% for msg in messages%}
+				<p>{{msg}}</p>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+	<br><br>
+	<div class="card">
+		<div class="main-container" >
+			<div class="fixer-container">
+				<h4 style="text-align:center;" id="title_text">Pomodoro timer</h4>
+				<div id="app">
+					<!-- The website used to display the circle is banned by my ISP-->
+				</div>
+				<br><br>
+				<!-- Fr, it's ticking me off why this isn't centred-->
+				<div id="centre">
+					<label >Select how many minutes you want to work for: <br> <input list="browsers" name="pomodoro"/></label>
+					<datalist id="browsers">
+						<option value="30">
+						<option value="60">
+						<option value="90">
+						<option value="120">
+						<option value="150">
+						<option value="180">
+					</datalist>
+			
+					<input type="button" value='Set cycle' onclick="Reset()"> 
+						
+					<form action="/education/pomodoro" method='POST'>
+						
+						<input type="button" id="start" class="btn-outline theme-success" size="height:5%;width=45%;margin-right:2%" value="Start" onclick="Start()">
+						<input type="button" id="pause" class="btn btn-outline-warning" size="height:5%;width=45%;margin-right:2%" value="Pause" onclick="Pause()">
+						<input type="button" value="Reset" onclick="Reset()"> 		
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<audio controls autoplay id="audio" src="static/mixkit-scanning-sci-fi-alarm-905.wav" type="audio/wav"> </audio>
+
+    <script>
+		const FULL_DASH_ARRAY = 283;
+		const WARNING_THRESHOLD = 10;
+		const ALERT_THRESHOLD = 5;
+
+		let duration = 25 * 60;
+		let timeLeft = duration;
+		let timerInterval = null;
+		document.getElementById("audio").muted = true;
+
+		const timerMarkup = `
+			<div class="base-timer">
+				<svg class="base-timer__svg" viewBox="0 0 100 100"
+					xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
+					<circle id="base-timer-path-remaining"
+						class="base-timer__path-remaining" cx="50" cy="50" r="45"></circle>
+				</svg>
+				<span id="base-timer-label" class="base-timer__label"
+					role="timer" aria-live="polite"></span>
+			</div>
+		`;
+
+		document.getElementById("app").innerHTML = timerMarkup;
+		updateDisplay();
+
+		function formatTime(seconds) {
+			const minutes = Math.floor(seconds / 60);
+			const remainingSeconds = seconds % 60;
+			return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+		}
+
+		function updateDisplay() {
+			document.getElementById("base-timer-label").textContent = formatTime(timeLeft);
+
+			const fraction = duration > 0 ? timeLeft / duration : 0;
+			const circle = document.getElementById("base-timer-path-remaining");
+			circle.style.strokeDashoffset = FULL_DASH_ARRAY * (1 - fraction);
+
+			circle.classList.toggle("orange", timeLeft <= WARNING_THRESHOLD && timeLeft > ALERT_THRESHOLD);
+			circle.classList.toggle("red", timeLeft <= ALERT_THRESHOLD);
+		}
+
+		function Start() {
+			if (timerInterval !== null) return;
+			document.getElementById("audio").muted = true;
+			// Read the selected duration when starting or restarting a finished timer.
+			if (timeLeft === 0) {
+				const minutes = Number(document.querySelector('input[name="pomodoro"]').value);
+				duration = Number.isFinite(minutes) && minutes > 0 ? minutes * 60 : 25 * 60;
+				timeLeft = duration;
+				updateDisplay();
+			}
+
+			timerInterval = setInterval(() => {
+				if (timeLeft > 0) {
+					timeLeft--;
+					updateDisplay();
+				} else {
+					//Should play the audio file now
+					document.getElementById("audio").muted = false;
+					clearInterval(timerInterval);
+					timerInterval = null;
+				}
+			}, 1000);
+		}
+
+		function Pause() {
+			clearInterval(timerInterval);
+			timerInterval = null;
+		}
+
+		function Reset() {
+			Pause();
+			const minutes = Number(document.querySelector('input[name="pomodoro"]').value);
+			duration = Number.isFinite(minutes) && minutes > 0 ? minutes * 60 : 25 * 60;
+			timeLeft = duration;
+			updateDisplay();
+		}
+	</script>
+
+{%endblock%}

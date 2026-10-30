@@ -1,0 +1,35 @@
+{%extends "base.html"%}
+{%block title%} To-do list application{%endblock%}
+{%block style%}
+	<style>
+		/* I need to learn how to make a website not ugly*/
+	</style>
+{%endblock%}
+{% block header %}
+<h1> Welcome to your collections of tasks. Here, you can modify and view your tasks</h1>	
+{% endblock %}
+{%block content%}
+    <div> Add a new task here:
+		<form action="/todo/add" method="POST">
+			<textarea rows="3" cols="50" type="text" name="task"></textarea>
+			<br><br>
+			<input type="submit" value="Add new task">
+		</form> 
+	</div>
+    <div>
+		<h2>Incomplete tasks</h2>
+		<ul class="list-group">
+			{%	for i in todo_list%}
+			<li class="list-group-item d-flex justify-content-between align-items-center"> {{i.body}} <a href="{{url_for('todo.complete', id=i.id)}}" class="btn-outline theme-success">Mark as complete</a></li>
+			<br><br>
+			{% endfor %}
+		</ul>
+		<h2>Completed task</h2>
+		<ul class="list-group">
+			{% for i in completed_todos%}
+				<li class="list-group-item d-flex justify-content-between align-items-center"> {{i.body}} <a href="{{url_for('todo.incomplete', id=i.id)}}" class="btn btn-success">Mark as incomplete</a> <a href="{{url_for('todo.delete', id=i.id)}}" class="btn-subtle theme-danger">Delete this task</a></li>
+				<br><br>
+			{% endfor%}
+		</ul>
+	</div>
+{%endblock%}

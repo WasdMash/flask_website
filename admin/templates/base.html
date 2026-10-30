@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <meta http-equiv="refresh" content="30">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+		
+        <title>{% block title%} {% endblock title%}</title>
+		{%block style%}{%endblock%}
+		
+    </head>
+    <body>
+        <header>
+          <div class="nav-overflow" data-bs-toggle="nav-overflow">
+            <ul class="nav nav-pills">
+              <li class="nav-item active">
+                <a class="nav-link" href="/user/{{detail}}">Home </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/login">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/education/home">Educate yourself</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/education/pomodoro">Get busy working</a>
+              </li>
+              <li class="nav-item ">
+                <a class="nav-link" href="/user/{{detail}}/edit_profile">Edit profile</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/todo/">View my to-do list</a>
+              </li>
+              <li>
+                <a class="nav-link" href="/logout">Log out</a>
+              </li>
+            </ul>
+          </div>
+
+        <div class="container-fluid">
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+            <button class="btn-outline theme-success" type="submit">Search</button>
+          </form>
+        </div>
+      </nav>
+           
+			<p></p>
+			<p></p>
+			<p></p>
+			<p></p>
+			{% block header%}
+			{% endblock%}			
+        </header>
+		
+		{%block content%}
+		
+		{%endblock%}
+
+		<script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
+
+    </body>
+</html>
