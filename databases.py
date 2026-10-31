@@ -50,8 +50,6 @@ class Todo(db.Model):
     timestamp = db.Column(db.DateTime(timezone=True), index=True, default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     complete = db.Column(db.Boolean)
-
-    #users_rel = db.relationship(users)
     def __repr__(self):
         return '<Task: {}>'.format(self.body)
 
@@ -61,9 +59,9 @@ class Todo(db.Model):
 #Intermediate table between Learning posts and Tag table, to ensure 2NF
 '''
 association_table = db.Table(
-    'association',
-    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id')),
-    db.Column('post_id', db.Integer, db.ForeignKey('learning.id'))
+    "association",
+    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), primary_key=True),
+    db.Column("post_id", db.Integer, db.ForeignKey("learning.id"), primary_key=True),
 )
 
 class Tag(db.Model):
@@ -93,26 +91,18 @@ class Learning(db.Model):
 
     pass
 
-'''
-#Intermediate table between Learning posts and Replies table, to ensure 2NF
-'''
-comment_table = db.Table(
-    'comment',
-    db.Column('reply_id', db.Integer, db.ForeignKey('replies.id')),
-    db.Column('learning_id', db.Integer, db.ForeignKey('learning.id'))
-)
-
 class Replies(db.Model):
-    #__searchable__ = ['title', 'body']
-    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     reply = db.Column(db.String(500), nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=func.now())
     upvotes = db.Column(db.Integer, default=0)
     downvotes = db.Column(db.Integer, default=0)
     last_modified = db.Column(db.DateTime, index=True, default=func.now())
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    post_id = db.Column(db.Integer,db.ForeignKey('learning.id'), primary_key=True)
-    author = db.relationship('Learning',secondary=comment_table,backref='post_replies')
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey("learning.id"), nullable=False)
+
+    comment_author = db.relationship("users", backref="replies")
     
     def __repr__(self):
         return '<Post title: {}>'.format(self.title)

@@ -31,15 +31,11 @@ def contribute():
             db.session.commit()
             flash("Post submitted successfully", category='message')
 
-        tags=request.form.get('tags').split(', ')
-        for i in tags:
-            new_tag = Tag(name=i)
-            db.session.add(new_tag)
+        for name in {tag.strip() for tag in (request.form.get("tags") or "").split(",") if tag.strip()}:
+            new_post.tags.append(Tag(name=name))
         db.session.commit() #Don't need to run a new commit per tag
 
-    #Save until I actually implement upvotes and downvotes
-    #return render_template("flaskindex.html", detail=str(session.get('user')), user=users.query.filter_by(name=session.get('user')).first(), posts=Learning.query.filter(Learning.upvotes>Learning.downvotes).order_by(Learning.upvotes-Learning.downvotes).limit(10))
-    return render_template("flaskindex.html", detail=str(session.get('user')), user=users.query.filter_by(name=session.get('user')).first(), posts=Learning.query.limit(10))
+    return render_template("flaskindex.html", detail=str(session.get('user')), user=users.query.filter_by(name=session.get('user')).first(), posts=Learning.query.filter(Learning.upvotes>Learning.downvotes).order_by(Learning.upvotes-Learning.downvotes).limit(10))
 
 @blueprint.route("/answer/<int:id>", methods=['POST','GET'])
 def answer(id):
