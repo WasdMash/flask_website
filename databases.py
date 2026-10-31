@@ -15,7 +15,7 @@ class users(db.Model, UserMixin):
     password = db.Column(db.String(100))
     tasks = db.relationship('Todo', backref='post_author', lazy='dynamic')
     learn = db.relationship('Learning', backref='question_author', lazy='dynamic')
-    reply = db.relationship('Replies', backref='comment_author', lazy='dynamic')
+    reply = db.relationship('Replies', back_populates='comment_author')
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
@@ -102,7 +102,7 @@ class Replies(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey("learning.id"), nullable=False)
 
-    comment_author = db.relationship("users", backref="replies")
+    comment_author = db.relationship("users", back_populates="reply")
     
     def __repr__(self):
         return '<Post title: {}>'.format(self.title)
