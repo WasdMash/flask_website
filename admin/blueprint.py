@@ -12,8 +12,9 @@ downvote = 1
 @blueprint.route("/home")
 @blueprint.route("/") 
 def home():
-    Posts = Learning.query.limit(5) # Fetches all todos from my database
-    return render_template("flaskindex.html", posts=Posts, user=users.query.filter_by(name=g.user).first())
+    #I wanna order the posts by which has the greatest upvote/downvote differential
+    posts = Learning.query.order_by((Learning.upvotes - Learning.downvotes).desc(), Learning.upvotes.desc()).limit(5).all()
+    return render_template("flaskindex.html", posts=posts, user=users.query.filter_by(name=g.user).first())
 
 @blueprint.route("/contribute", methods=['POST','GET'])
 def contribute():
@@ -34,7 +35,7 @@ def contribute():
         for i in tags:
             new_tag = Tag(name=i)
             db.session.add(new_tag)
-            db.session.commit()
+        db.session.commit() #Don't need to run a new commit per tag
 
     #Save until I actually implement upvotes and downvotes
     #return render_template("flaskindex.html", detail=str(session.get('user')), user=users.query.filter_by(name=session.get('user')).first(), posts=Learning.query.filter(Learning.upvotes>Learning.downvotes).order_by(Learning.upvotes-Learning.downvotes).limit(10))
@@ -95,20 +96,18 @@ def edit_post(detail):
 def upvote(id):
     #return "<h1>{}</h1>".format(id)
     item = Learning.query.filter_by(id=int(id)).first()
-    if session.get('user') == item.question_author:
-        upvote = -upvote
+    if session.get('user') != item.question_author:
         item.upvotes += upvote
-    db.session.commit()
+        db.session.commit()
     return redirect(url_for("blueprint.home"))
 
 @blueprint.route('/downvote/<id>')
 def downvote(id):
     #return "<h1>{}</h1>".format(id)
     item = Learning.query.filter_by(id=int(id)).first()
-    if session.get('user') == item.question_author:
-        downvote = -downvote
+    if session.get('user') != item.question_author:
         item.upvotes -= downvote
-    db.session.commit()
+        db.session.commit()
     return redirect(url_for("blueprint.home"))
 
 @blueprint.route('/upvote_post/<id>')

@@ -42,11 +42,11 @@
 		<h2> Would you like to ask a question?</h2>
 		<h4>Make sure to look at a couple of previous questions to make sure that your question hasn't already been answered</h4>
 		<form action="/education/contribute" method="POST">
-			<textarea rows="2" name="title" placeholder="What exactly is your question?"></textarea>/>
+			<textarea rows="2" cols="50" name="title" placeholder="What exactly is your question?"></textarea>
 			<br><br>
-			<textarea rows="3" name="body" placeholder="Be as descriptive about your question as possible. What exactly is not making sense to you? Use as many keywords as necessary to get what you want to know across."></textarea>
+			<textarea rows="3" cols="50" name="body" placeholder="Be as descriptive about your question as possible. What exactly is not making sense to you? Use as many keywords as necessary to get what you want to know across."></textarea>
 			<br><br>
-			<textarea rows="3" name="tags" placeholder="Enter tags (separated by commas) which can help others in your situation find the question. Use examples such as subject, sub-topic, year and other keywords etc."></textarea>
+			<textarea rows="3" cols="50" name="tags" placeholder="Enter tags (separated by commas) which can help others in your situation find the question. Use examples such as subject, sub-topic, year and other keywords etc."></textarea>
 			<br><br>
 			<input class="btn btn-warning"type="submit" name="Submit" value="Ask a question" />
 		</form>
@@ -108,7 +108,7 @@
 					<div class="card-body">
 						<h4 class="card-title">Answers</h4>
 						<form method="POST" action="/education/answer/{{item.id}}">
-							<textarea rows="3" cols="50 "placeholder="Wish to answer this question? Feel free to answer."></textarea>
+							<textarea rows="3" cols="50" name="reply_text" placeholder="Wish to answer this question? Feel free to answer."></textarea>
 							<br> <input type="submit" name="Submit" value="Answer">
 						</form>
 						{%for reply in item.replies%}
@@ -135,4 +135,8 @@
 		</div>
 		<br><br>
 	{%endfor%}
+
+	<script>
+		document.querySelectorAll('.toast').forEach((element) => { bootstrap.Toast.getOrCreateInstance(element).show(); });
+	</script>
 {%endblock%}
