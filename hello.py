@@ -91,7 +91,7 @@ def user(detail):
         return render_template("flaskindex.html", detail=session.get('user'), posts=Posts, user=users.query.filter_by(name=session.get('user')).first())
     else:
         app.logger.info("Tried to skip the queue, huh? Your mistake.")
-        flash("You are not logged in yet, you should login in for full access to all features")
+        flash("You are not logged in yet, you should login in for full access to all features", category='warning')
         return redirect(url_for("login"))
 
 @app.route("/user/<detail>/edit_profile", methods=['POST','GET'])
@@ -102,20 +102,20 @@ def edit_profile(detail):
         if email:
             session["email"] = email
             found_user.email = email
-            flash("Email has been saved successfully")
+            flash("Email has been saved successfully", category='info')
             app.logger.info("Your email, which is " + str(session.get('email')) + " has been saved successfully")
 
         name = request.form.get('nm')
         if name:
             session["user"] = name
             found_user.name = name
-            flash("Name has been saved successfully")
+            flash("Name has been saved successfully", category='info')
             app.logger.info("Your name, which is " + str(users.query.filter_by(name=str(name)).first().name) + " has been saved successfully")
 
         about_me = request.form.get('about_me')
         if about_me:
             found_user.about_me = about_me
-            flash("Your self-description has been saved successfully")
+            flash("Your self-description has been saved successfully", category='info')
             app.logger.info(users.query.filter_by(about_me=about_me).first().about_me)
 
         p1 = request.form.get('password1')
@@ -136,7 +136,7 @@ def edit_profile(detail):
             return render_template("edit_details.html", detail=str(detail), user=users.query.filter_by(name=detail).first())
         else:
             app.logger.info("Tried to skip the queue, huh? Your mistake.")
-            flash("You are not logged in yet, you should login in for full access to all features")
+            flash("You are not logged in yet, you should login in for full access to all features", category='warning')
             return redirect(url_for("login"))
 
 @app.route("/signup", methods=['GET','POST'])

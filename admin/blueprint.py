@@ -62,20 +62,20 @@ def edit_post(detail):
         title = request.form.get("title")
         if title:
             post.title = title
-            flash("Question has been saved successfully")
+            flash("Question has been saved successfully", category='info')
             current_app.logger.info("Your question, which is " + str(post.query.filter_by(title=title).first().title) + " has been saved successfully")
 
         body = request.form.get('body')
         if body:
             post.body = body
-            flash("Question body has been saved successfully")
+            flash("Question body has been saved successfully", category='info')
             current_app.logger.info("Your question details, which is " + str(post.query.filter_by(body=body).first().body) + " has been saved successfully")
 
         tags = request.form.get('tags').split(', ')
         if tags:
             post.tags = tags
             db.session.add(post)
-            flash("New tags have been saved successfully")
+            flash("New tags have been saved successfully", category='info')
             current_app.logger.info("Your tags, which is " + str(post.query.filter_by(tags=tags).first().tags) + " has been saved successfully")
 
         post.last_modified = datetime.datetime.now()
@@ -88,7 +88,7 @@ def edit_post(detail):
             return render_template("flaskindex.html", detail=str(detail), user=users.query.filter_by(name=detail).first(), posts=Learning.query.filter(db.Learning.upvotes>db.Learning.downvotes).order_by(db.Learning.upvotes-db.Learning.downvotes).limit(10))
         else:
             current_app.logger.info("Tried to skip the queue, huh? Your mistake.")
-            flash("You are not logged in yet, you should login in for full access to all features")
+            flash("You are not logged in yet, you should login in for full access to all features", category='warning')
             return redirect(url_for("login"))
 
 @blueprint.route('/upvote/<id>')
