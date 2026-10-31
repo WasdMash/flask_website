@@ -27,7 +27,7 @@
 	</style>
 {%endblock%}
 {% block content%}
-	{% with messages  = get_flashed_messages()%}
+	{% with messages  = get_flashed_messages(with_categories=true)%}
 		{% if messages%}
 		<div aria-live="polite" aria-atomic="true" class="position-relative">
   			<div class="toast-container top-0 end-0 p-3">
